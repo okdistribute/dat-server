@@ -4,7 +4,10 @@
   "description": "a server with all of your dats",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run watch & node cli.js",
+    "watch": "watchify -t [ babelify --presets [ react ] ] app/frontend.js -o app/static/bundle.js",
+    "build": "browserify -t [ babelify --presets [ react ] ] app/frontend.js -o app/static/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +18,21 @@
   "bugs": {
     "url": "https://github.com/karissa/dat-server/issues"
   },
-  "homepage": "https://github.com/karissa/dat-server#readme"
+  "homepage": "https://github.com/karissa/dat-server#readme",
+  "dependencies": {
+    "dat-manager": "^1.1.1",
+    "minimist": "^1.2.0",
+    "getport": "^0.1.0",
+    "http-hash-router": "^1.1.0",
+    "body": "^5.1.0",
+    "react-editinplace": "^1.0.3",
+    "rimraf": "^2.5.1",
+    "xhr": "^2.2.0",
+    "tape": "^4.4.0",
+    "babel-preset-react": "^6.5.0",
+    "watchify": "^3.7.0",
+    "babelify": "^7.2.0",
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7"
+  }
 }
