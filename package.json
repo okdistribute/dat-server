@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run watch & node cli.js",
-    "watch": "watchify -t [ babelify --presets [ react ] ] app/frontend.js -o app/static/bundle.js",
-    "build": "browserify -t [ babelify --presets [ react ] ] app/frontend.js -o app/static/bundle.js"
+    "watch": "watchify -t [ babelify --presets [ react ] ] frontend.js -o static/bundle.js",
+    "build": "browserify -t [ babelify --presets [ react ] ] frontend.js -o static/bundle.js"
   },
   "repository": {
     "type": "git",
