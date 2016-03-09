@@ -21,3 +21,7 @@ body {
 main {
   margin-top: 40px;
 }
+
+nav ul a {
+  color: #2a3749;
+}
