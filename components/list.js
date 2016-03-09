@@ -1,5 +1,6 @@
 var React = require('react')
 var ReactDOM = require('react-dom')
+var prettyBytes = require('pretty-bytes')
 var EditInPlace = require('react-editinplace')
 
 var xhr = require('../request.js')
@@ -126,9 +127,11 @@ var ListItem = React.createClass({
     })
   },
   render: function () {
+    var size = prettyBytes(this.props.dat.value.stats.size)
     return (
       <div className='section list-item' onClick={this.handleClick}>
         <NameLabel dat={this.props.dat} />
+        <div>{size}</div>
         <p>{this.props.dat.value.link}</p>
         <div>
           {this.state.running ? <StopButton list={this} dat={this.props.dat} /> : <StartButton list={this} dat={this.props.dat} />}
