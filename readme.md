@@ -2,18 +2,35 @@
 
 [![NPM](https://nodei.co/npm/dat-server.png)](https://nodei.co/npm/dat-server/)
 
-Under active development.
+![static/example.png](static/example.png)
+
+
+## Installation
+
+1. Clone this repository and install dependencies.
+
+```
+git clone https://github.com/karissa/dat-server.git
+cd dat-server
+npm install
+```
+
+2. Create the config
+
+Pay attention to where downloaded dats will be stored. Edit the `location` field so that it suits your setup.
+
+```
+cp example.config.json config.json
+```
+
+3. Build assets and run the app.
 
 ```
 npm start
 ```
 
-## Built-in routes
 
-On error:
-```
-{ "error": true, "message": "the error message goes here.."}
-```
+# API
 
 ### Main screen
 
