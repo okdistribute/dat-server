@@ -5,10 +5,19 @@
   margin-bottom: 15px;
 }
 
+nav {
+  background-color: #eee;
+  box-shadow: none;
+}
+
 .list-item a {
   margin-right: 15px;
 }
 
 body {
   background-color: #eee;
+}
+
+main {
+  margin-top: 40px;
 }

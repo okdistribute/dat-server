@@ -7,16 +7,25 @@ var url = require('url')
 
 module.exports = createRouter
 
-function createRouter () {
+function createRouter (settings) {
   var router = Router()
-  var manager = Manager()
-
-  router.set('/static/*', function (req, res, opts, cb) {
-    res.end(fs.readFileSync(path.join(__dirname, 'static', opts.splat)).toString())
-  })
+  var manager = Manager(settings)
 
   router.set('/', function (req, res, opts, cb) {
     res.end(fs.readFileSync(path.join(__dirname, 'index.html')).toString())
+  })
+
+  router.set('/api/settings', function (req, res, opts, cb) {
+    if (req.method === 'POST') {
+      json(req, function (err, data) {
+        if (err) return cb(err)
+        settings = data
+        manager.settings(data)
+        res.end('ok')
+      })
+    } else {
+      res.end(JSON.stringify(settings))
+    }
   })
 
   router.set('/dats', function (req, res, opts, cb) {
