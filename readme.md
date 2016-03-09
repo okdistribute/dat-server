@@ -1,9 +1,8 @@
 # dat-server
 
-[![NPM](https://nodei.co/npm/dat-server.png)](https://nodei.co/npm/dat-server/)
+A web interface for managing [dat repositories](http://dat-data.com) on a remote server.
 
 ![static/example.png](static/example.png)
-
 
 ## Installation
 

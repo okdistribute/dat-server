@@ -1,7 +1,7 @@
 {
   "name": "dat-server",
   "version": "1.0.0",
-  "description": "a server with all of your dats",
+  "description": "A web interface for managing [dat repositories](http://dat-data.com) on a remote server.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
