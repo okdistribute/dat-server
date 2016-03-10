@@ -3,6 +3,7 @@ var renderList = require('./components/list')
 
 var $name = document.getElementById('name')
 var $link = document.getElementById('link')
+var $loading = document.getElementById('loading')
 
 document.getElementById('submit').onclick = submit
 
@@ -11,10 +12,12 @@ function submit (event) {
     uri: '/dats/' + $name.value.trim() + '/start?link=' + $link.value.trim(),
     json: true
   }
+  $name.value = ''
+  $link.value = ''
+  $loading.style = 'display:block;'
   xhr(opts, function (resp, json) {
     renderList()
-    $name.value = ''
-    $link.value = ''
+    $loading.style = 'display:none;'
   })
 }
 

@@ -25,3 +25,7 @@ main {
 nav ul a {
   color: #2a3749;
 }
+
+.centered {
+  text-align: center;
+}
