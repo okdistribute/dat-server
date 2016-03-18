@@ -39,7 +39,7 @@ function createRouter (settings) {
   })
 
   router.set('/dats/:key', function (req, res, opts, cb) {
-    var key = opts.params.key
+    var key = decodeURIComponent(opts.params.key)
     if (req.method === 'GET') {
       manager.get(key, function (err, dat) {
         if (err) return cb(err)
@@ -64,7 +64,7 @@ function createRouter (settings) {
 
   router.set('/dats/:key/start', function (req, res, opts, cb) {
     if (req.method !== 'GET') return cb(new Error('Method not allowed.'))
-    var key = opts.params.key
+    var key = decodeURIComponent(opts.params.key)
     var link = url.parse(req.url, true).query.link
     manager.start(key, {link: link}, function (err, data) {
       if (err) return cb(err)
@@ -74,7 +74,8 @@ function createRouter (settings) {
 
   router.set('/dats/:key/stop', function (req, res, opts, cb) {
     if (req.method !== 'GET') return cb(new Error('Method not allowed.'))
-    manager.stop(opts.params.key, function (err, data) {
+    var key = opts.params.key
+    manager.stop(key, function (err, data) {
       if (err) return cb(err)
       res.end(JSON.stringify(data))
     })
