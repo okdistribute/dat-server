@@ -12,9 +12,9 @@ var StopButton = React.createClass({
   stop: function () {
     var self = this
     self.setState({loading: true})
-    var name = self.props.dat.key
+    var key = self.props.dat.key
     var opts = {
-      uri: '/dats/' + name + '/stop',
+      uri: '/dats/' + key + '/stop',
       json: true
     }
     xhr(opts, function (resp, data) {
@@ -39,9 +39,9 @@ var StartButton = React.createClass({
   start: function () {
     var self = this
     self.setState({loading: true})
-    var name = self.props.dat.key
+    var key = self.props.dat.key
     var opts = {
-      uri: '/dats/' + name + '/start',
+      uri: '/dats/' + key + '/start',
       json: true
     }
     xhr(opts, function (resp, data) {
@@ -62,21 +62,21 @@ var StartButton = React.createClass({
 var NameLabel = React.createClass({
   getInitialState: function () {
     return {
-      name: this.props.dat.key
+      key: this.props.dat.key
     }
   },
   onchange: function (text) {
     var self = this
     text = text.trim()
     var opts = {
-      uri: '/dats/' + self.state.name,
+      uri: '/dats/' + self.state.key,
       method: 'PUT',
       json: {
-        name: text
+        key: text
       }
     }
     xhr(opts, function (resp, json) {
-      self.setState({name: text})
+      self.setState({key: text})
     })
   },
   validation: function (text) {
@@ -91,7 +91,7 @@ var NameLabel = React.createClass({
       <EditInPlace
         validate={this.validation}
         onChange={this.onchange}
-        text={this.state.name}
+        text={this.state.key}
         className='list-item__key' />
     </h5>
     )

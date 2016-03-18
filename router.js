@@ -38,22 +38,22 @@ function createRouter (settings) {
     else res.end('Method not allowed.')
   })
 
-  router.set('/dats/:name', function (req, res, opts, cb) {
-    var name = opts.params.name
+  router.set('/dats/:key', function (req, res, opts, cb) {
+    var key = opts.params.key
     if (req.method === 'GET') {
-      manager.get(name, function (err, dat) {
+      manager.get(key, function (err, dat) {
         if (err) return cb(err)
         res.end(JSON.stringify(dat))
       })
     } else if (req.method === 'DELETE') {
-      manager.delete(name, function (err) {
+      manager.delete(key, function (err) {
         if (err) return cb(err)
         res.end('ok')
       })
     } else if (req.method === 'PUT') {
       json(req, function (err, data) {
         if (err) return cb(err)
-        manager.update(name, data, function (err) {
+        manager.update(key, data, function (err) {
           if (err) return cb(err)
           res.end('ok')
         })
@@ -62,19 +62,19 @@ function createRouter (settings) {
     else return cb(new Error('Method not allowed.'))
   })
 
-  router.set('/dats/:name/start', function (req, res, opts, cb) {
+  router.set('/dats/:key/start', function (req, res, opts, cb) {
     if (req.method !== 'GET') return cb(new Error('Method not allowed.'))
-    var name = opts.params.name
+    var key = opts.params.key
     var link = url.parse(req.url, true).query.link
-    manager.start(name, {link: link}, function (err, data) {
+    manager.start(key, {link: link}, function (err, data) {
       if (err) return cb(err)
       res.end(JSON.stringify(data))
     })
   })
 
-  router.set('/dats/:name/stop', function (req, res, opts, cb) {
+  router.set('/dats/:key/stop', function (req, res, opts, cb) {
     if (req.method !== 'GET') return cb(new Error('Method not allowed.'))
-    manager.stop(opts.params.name, function (err, data) {
+    manager.stop(opts.params.key, function (err, data) {
       if (err) return cb(err)
       res.end(JSON.stringify(data))
     })
