@@ -79,17 +79,10 @@ var NameLabel = React.createClass({
       self.setState({key: text})
     })
   },
-  validation: function (text) {
-    text = text.trim()
-    var match = text.match(/^[a-zA-Z0-9_]*$/)
-    if (match) return true
-    else return false
-  },
   render: function () {
     return (
     <h5>
       <EditInPlace
-        validate={this.validation}
         onChange={this.onchange}
         text={this.state.key}
         className='list-item__key' />
