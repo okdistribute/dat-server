@@ -94,27 +94,3 @@ DELETE `/dats/:name`
 Delete a dat, removing all data. It's gone. NADA!
 
 Returns `{ deleted: true }` if successful.
-
-## Installation
-
-```
-npm install -g dat-manager
-```
-
-or, clone from github
-
-```
-git clone https://github.com/karissa/dat-manager.git
-cd dat manager
-npm install
-npm start
-```
-
-## Deployment
-
-You can set environment variable for `PORT`.
-
-```
-$ PORT=50002 dat-manager
-Listening on port 50002
-```
