@@ -74,7 +74,7 @@ function createRouter (settings) {
 
   router.set('/dats/:key/stop', function (req, res, opts, cb) {
     if (req.method !== 'GET') return cb(new Error('Method not allowed.'))
-    var key = opts.params.key
+    var key = decodeURIComponent(opts.params.key)
     manager.stop(key, function (err, data) {
       if (err) return cb(err)
       res.end(JSON.stringify(data))
