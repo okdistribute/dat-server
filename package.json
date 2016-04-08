@@ -1,10 +1,10 @@
 {
   "name": "dat-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "dat dat server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "standard && node test.js"
   },
   "repository": {
     "type": "git",
@@ -18,6 +18,24 @@
   },
   "homepage": "https://github.com/karissa/dat-server#readme",
   "dependencies": {
-    "from2": "^2.1.1"
+    "auto-daemon": "^2.6.0",
+    "debut": "0.0.10",
+    "discovery-swarm": "^3.1.2",
+    "folder-walker": "^2.1.1",
+    "from2": "^2.1.1",
+    "home-dir": "^1.0.0",
+    "hyperdrive": "^4.1.0",
+    "jquery": "^2.2.3",
+    "jquery.transit": "^0.9.12",
+    "level-party": "^3.0.4",
+    "mkdirp": "^0.5.1",
+    "pump": "^1.0.1",
+    "speedometer": "^1.0.0",
+    "stream-each": "^1.1.2",
+    "through2": "^2.0.1",
+    "xtend": "^4.0.1"
+  },
+  "devDependencies": {
+    "standard": "^6.0.8"
   }
 }

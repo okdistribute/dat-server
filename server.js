@@ -1,7 +1,8 @@
-var dat = require('./')()
+var Dat = require('./')
 var from = require('from2')
 
 module.exports = function (server, stream) {
+  var dat = Dat()
   return {
     join: function (link, dir) {
       var progress = dat.join(link, dir)
