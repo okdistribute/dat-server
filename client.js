@@ -1,10 +1,11 @@
 var autod = require('auto-daemon')
 var extend = require('xtend')
 var path = require('path')
+var os = require('os')
 
 var autodOpts = {
   rpcfile: path.join(__dirname, 'server.js'),
-  sockfile: path.join(__dirname, 'datmon.sock'),
+  sockfile: path.join(os.tmpdir(), 'datserver.sock'),
   methods: [ 'join:s', 'leave', 'close' ]
 }
 

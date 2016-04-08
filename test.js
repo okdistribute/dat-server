@@ -2,7 +2,8 @@ var fs = require('fs')
 var path = require('path')
 var test = require('tape')
 var client = require('./client.js')
-var sockPath = path.join(__dirname, 'datmon.sock')
+var os = require('os')
+var sockPath = path.join(os.tmpdir(), 'datserver.sock')
 
 test('kills the matt daemon', function (t) {
   client(function (err, rpc, conn) {
