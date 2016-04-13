@@ -6,3 +6,4 @@ A daemonized Dat server you can control through a JavaScript RPC client.
 
 ## API
 
+See test/client.js for example.
