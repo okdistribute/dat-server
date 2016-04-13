@@ -130,7 +130,7 @@ Dat.prototype.link = function (dir, cb) {
   return emitter
 
   function eachItem (item, next) {
-    if (item.path === item.root.slice(0, item.root.length - 1)) return next()
+    if (item.path === item.root) return next()
     var appendStats = archive.appendFile(item.path, item.name, next)
     // This could accumulate too many objects if
     // logspeed is slow & scanning many files.

@@ -6,6 +6,8 @@ var os = require('os')
 var sockPath = path.join(os.tmpdir(), 'datserver.sock')
 var testdat = path.join(__dirname, 'testdat')
 
+var TEST_HASH = 'c98a7c5c6fe0b539b496fbe73d4ec2f270106794774614c5fb52fc47fda3b236'
+
 test('close and destroy kills the matt daemon', function (t) {
   client(function (err, rpc, conn) {
     t.ifErr(err)
@@ -26,7 +28,7 @@ test('link', function (t) {
     t.ifErr(err)
     rpc.link(testdat, function (err, link) {
       t.ifErr(err)
-      t.equals(link, 'f692fb02bc5bfd8faa32b1749da6d38c16104cbfffbf0d84a4f7708ed55009d7')
+      t.equals(link, TEST_HASH)
       conn.destroy()
       t.end()
     })
@@ -38,7 +40,7 @@ test('status', {timeout: 5000}, function (t) {
     t.ifErr(err, 'no err')
     rpc.link(testdat, function (err, link) {
       t.ifErr(err, 'no err')
-      t.equals(link, 'f692fb02bc5bfd8faa32b1749da6d38c16104cbfffbf0d84a4f7708ed55009d7')
+      t.equals(link, TEST_HASH)
     })
 
     // tests basename
@@ -78,7 +80,7 @@ test('join', {timeout: 5000}, function (t) {
     rpc.link(testdat, function (err, hash) {
       t.ifErr(err, 'no err')
       link = hash
-      t.equals(link, 'f692fb02bc5bfd8faa32b1749da6d38c16104cbfffbf0d84a4f7708ed55009d7')
+      t.equals(link, TEST_HASH)
       rpc.join(link, testdat, function (err) {
         t.ifErr(err, 'no err')
       })
@@ -98,7 +100,8 @@ test('join', {timeout: 5000}, function (t) {
       }
       rpc.status(function (err, status) {
         if (err) t.ifErr(err, 'no err')
-        console.log(status)
+        var key = Object.keys(status)[0]
+        if (status[key].progress.bytesRead === 3) gotCompleteStatus = true
         setTimeout(getStatus, 10)
       })
     }
