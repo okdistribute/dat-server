@@ -188,9 +188,9 @@ Dat.prototype.join = function (link, dir, opts, cb) {
   if ((typeof opts) === 'function') return this.join(link, dir, {}, opts)
   if (!opts) opts = {}
   if (!cb) cb = function noop () {}
-  var emitter = new events.EventEmitter()
 
-  var stats = emitter.stats = {
+  var emitter = new events.EventEmitter()
+  var stats = this.status[dir] = {
     progress: {
       bytesRead: 0,
       filesRead: 0
@@ -229,13 +229,13 @@ Dat.prototype.join = function (link, dir, opts, cb) {
       stats.total.bytesTotal += item.size
       if (item.type === 'file') stats.total.filesTotal++
       else stats.total.directories++
-      emitter.emit('data', stats)
+      emitter.emit('stats')
       next(null)
     })
     pump(archive.createEntryStream(), counter, function (err) {
       if (err) return cb(err)
       stats.hasMetadata = true
-      emitter.emit('data', stats)
+      emitter.emit('stats')
       downloadStream()
     })
 
@@ -249,7 +249,7 @@ Dat.prototype.join = function (link, dir, opts, cb) {
   archive.on('file-download', function (entry, data, block) {
     stats.progress.bytesRead += data.length
     stats.downloadRate = downloadRate(data.length)
-    emitter.emit('data', stats)
+    emitter.emit('stats')
   })
 
   return emitter

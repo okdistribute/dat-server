@@ -21,18 +21,6 @@ test('close and destroy kills the matt daemon', function (t) {
   })
 })
 
-test('gets a stream from join', function (t) {
-  client(function (err, rpc, conn) {
-    t.ifErr(err)
-    t.ok(true, 'called the client connect callback')
-    rpc.close(function (err) {
-      t.ifErr(err)
-      conn.destroy()
-      t.end()
-    })
-  })
-})
-
 test('link', function (t) {
   client(function (err, rpc, conn) {
     t.ifErr(err)
@@ -67,14 +55,50 @@ test('status', {timeout: 5000}, function (t) {
     function getStatus () {
       if (gotCompleteStatus) {
         t.ok(true, 'got complete status')
-        conn.destroy()
-        t.end()
-        return
+        rpc.close(function (err) {
+          t.ifErr(err, 'no err')
+          conn.destroy()
+          t.end()
+        })
       }
       rpc.status(function (err, status) {
         if (err) t.ifErr(err, 'no err')
         var key = Object.keys(status)[0]
         if (status[key].progress.bytesRead === 3) gotCompleteStatus = true
+        setTimeout(getStatus, 10)
+      })
+    }
+  })
+})
+
+test('join', {timeout: 5000}, function (t) {
+  client(function (err, rpc, conn) {
+    t.ifErr(err, 'no err')
+    var link
+    rpc.link(testdat, function (err, hash) {
+      t.ifErr(err, 'no err')
+      link = hash
+      t.equals(link, 'f692fb02bc5bfd8faa32b1749da6d38c16104cbfffbf0d84a4f7708ed55009d7')
+      rpc.join(link, testdat, function (err) {
+        t.ifErr(err, 'no err')
+      })
+    })
+
+    // tests status value
+    var gotCompleteStatus = false
+    setTimeout(getStatus, 10)
+    function getStatus () {
+      if (gotCompleteStatus) {
+        t.ok(true, 'got complete status')
+        rpc.close(function (err) {
+          t.ifErr(err, 'no err')
+          conn.destroy()
+          t.end()
+        })
+      }
+      rpc.status(function (err, status) {
+        if (err) t.ifErr(err, 'no err')
+        console.log(status)
         setTimeout(getStatus, 10)
       })
     }

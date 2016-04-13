@@ -10,8 +10,8 @@ module.exports = function (server, stream) {
     link: function (dirs, cb) {
       dat.link(dirs, cb)
     },
-    join: function (link, dir, cb) {
-      dat.join(link, dir)
+    join: function (link, dir, opts, cb) {
+      dat.join(link, dir, opts, cb)
     },
     leave: function (id, cb) {
       dat.leave(id)
