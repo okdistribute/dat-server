@@ -28,7 +28,7 @@ function Dat (opts) {
   this.drive = drive
   this.allPeers = {}
   this.blacklist = {}
-  this.dats = {}
+  this.status = {}
 
   var discovery = opts.discovery !== false
   this.swarm = discoverySwarm({
@@ -74,8 +74,8 @@ Dat.prototype.scan = function (dirs, onEach, cb) {
   }, cb)
 }
 
-Dat.prototype.fileStats = function (dirs, cb) {
-  this.scan(dirs, eachItem, done)
+Dat.prototype.fileStats = function (dir, cb) {
+  this.scan(dir, eachItem, done)
 
   var totalStats = {
     filesTotal: 0,
@@ -101,12 +101,13 @@ Dat.prototype.fileStats = function (dirs, cb) {
   }
 }
 
-Dat.prototype.addFiles = function (dirs, cb) {
+Dat.prototype.link = function (dir, cb) {
+  if (Array.isArray(dir)) throw new Error('cannot specify multiple dirs in .link')
   var archive = this.drive.add('.')
-  this.scan(dirs, eachItem, done)
+  this.scan(dir, eachItem, done)
   var emitter = new events.EventEmitter()
 
-  var stats = {
+  var stats = this.status[dir] = {
     progress: {
       bytesRead: 0,
       bytesDownloaded: 0,
@@ -123,7 +124,7 @@ Dat.prototype.addFiles = function (dirs, cb) {
   archive.on('file-upload', function (entry, data) {
     stats.uploaded.bytesRead += data.length
     stats.uploadRate = uploadRate(data.length)
-    emitter.emit('data', stats)
+    emitter.emit('stats')
   })
 
   return emitter
@@ -141,7 +142,7 @@ Dat.prototype.addFiles = function (dirs, cb) {
       appendStats.on('end', function () {
         stats.progress.filesRead += 1
         stats.progress.bytesRead += appendStats.bytesRead
-        emitter.emit('data', stats)
+        emitter.emit('stats')
       })
     }
   }
@@ -151,7 +152,7 @@ Dat.prototype.addFiles = function (dirs, cb) {
     archive.finalize(function (err) {
       if (err) return cb(err)
       var link = archive.id.toString('hex')
-      emitter.emit('data', stats)
+      emitter.emit('stats')
       cb(null, link)
     })
   }

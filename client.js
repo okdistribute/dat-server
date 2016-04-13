@@ -6,7 +6,7 @@ var os = require('os')
 var autodOpts = {
   rpcfile: path.join(__dirname, 'server.js'),
   sockfile: path.join(os.tmpdir(), 'datserver.sock'),
-  methods: [ 'join:s', 'leave', 'close' ]
+  methods: [ 'status', 'link', 'join', 'leave', 'close' ]
 }
 
 module.exports = function (opts, cb) {

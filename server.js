@@ -1,23 +1,17 @@
 var Dat = require('./dat.js')
-var from = require('from2')
+// var through = require('through2')
 
 module.exports = function (server, stream) {
   var dat = Dat()
   return {
     status: function (cb) {
-      // returns {
-      //   '23i4jo2i34jo233i4j': {
-      //     connected: 5,
-      //     uploadRate: 23084,
-      //   }
-      // }
+      cb(null, dat.status)
     },
-    link: function (cb) {
-      // return stream of import stats
-
+    link: function (dirs, cb) {
+      dat.link(dirs, cb)
     },
     join: function (link, dir, cb) {
-      var progress = dat.join(link, dir)
+      dat.join(link, dir)
     },
     leave: function (id, cb) {
       dat.leave(id)
