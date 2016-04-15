@@ -106,12 +106,12 @@ Dat.prototype.link = function (dir, cb) {
   if (Array.isArray(dir)) throw new Error('cannot specify multiple dirs in .link')
   self.fileStats(dir, function (err, totalStats) {
     if (err) throw err
-    self.status[dir] = {total: totalStats}
     var archive = self.drive.add('.')
     self.scan(dir, eachItem, done)
     var emitter = new events.EventEmitter()
 
     var stats = self.status[dir] = {
+      total: totalStats,
       progress: {
         bytesRead: 0,
         bytesDownloaded: 0,
@@ -227,6 +227,8 @@ Dat.prototype.join = function (link, dir, opts, cb) {
   archive.ready(function (err) {
     if (err) return cb(err)
     var download = self.fs.createDownloadStream(archive, stats, opts)
+    stats.gettingMetadata = true
+    emitter.emit('stats')
     var counter = through.obj(function (item, enc, next) {
       if (typeof stats.parentFolder === 'undefined') {
         var segments = item.name.split(path.sep)
