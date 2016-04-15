@@ -2,7 +2,9 @@ var client = require('./client.js')
 
 module.exports = Dat
 
-function Dat () { }
+function Dat () {
+  if (!(this instanceof Dat)) return new Dat()
+}
 
 Dat.prototype.join = function (link, dir, cb) {
   client(function (err, rpc, conn) {

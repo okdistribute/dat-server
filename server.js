@@ -1,8 +1,9 @@
 var Dat = require('./dat.js')
 // var through = require('through2')
 
+var dat = Dat()
+
 module.exports = function (server, stream) {
-  var dat = Dat()
   return {
     status: function (cb) {
       cb(null, dat.status)
