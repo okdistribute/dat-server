@@ -22,16 +22,16 @@ function Dat (opts) {
   if (!(this instanceof Dat)) return new Dat(opts)
   if (!opts) opts = {}
   var self = this
-  this.fs = opts.fs || require('./fs.js')
-  this.level = opts.db || require('./db.js')(opts)
-  var drive = hyperdrive(this.level)
-  this.drive = drive
-  this.allPeers = {}
-  this.blacklist = {}
-  this.status = {}
+  self.fs = opts.fs || require('./fs.js')
+  self.level = opts.db || require('./db.js')(opts)
+  var drive = hyperdrive(self.level)
+  self.drive = drive
+  self.allPeers = {}
+  self.blacklist = {}
+  self.status = {}
 
   var discovery = opts.discovery !== false
-  this.swarm = discoverySwarm({
+  self.swarm = discoverySwarm({
     id: drive.core.id,
     dns: discovery && {server: DEFAULT_DISCOVERY, domain: DAT_DOMAIN},
     dht: discovery,
@@ -39,8 +39,8 @@ function Dat (opts) {
       return drive.createPeerStream()
     }
   })
-  this.swarm.listen(opts.port || DEFAULT_PORT)
-  this.swarm.once('error', function (err) {
+  self.swarm.listen(opts.port || DEFAULT_PORT)
+  self.swarm.once('error', function (err) {
     if (err.code === 'EADDRINUSE') self.swarm.listen(0) // asks OS for first open port
     else throw err
   })
@@ -102,60 +102,66 @@ Dat.prototype.fileStats = function (dir, cb) {
 }
 
 Dat.prototype.link = function (dir, cb) {
+  var self = this
   if (Array.isArray(dir)) throw new Error('cannot specify multiple dirs in .link')
-  var archive = this.drive.add('.')
-  this.scan(dir, eachItem, done)
-  var emitter = new events.EventEmitter()
+  self.fileStats(dir, function (err, totalStats) {
+    if (err) throw err
+    self.status[dir] = {total: totalStats}
+    var archive = self.drive.add('.')
+    self.scan(dir, eachItem, done)
+    var emitter = new events.EventEmitter()
 
-  var stats = this.status[dir] = {
-    progress: {
-      bytesRead: 0,
-      bytesDownloaded: 0,
-      filesRead: 0,
-      filesDownloaded: 0
-    },
-    uploaded: {
-      bytesRead: 0
-    },
-    fileQueue: []
-  }
+    var stats = self.status[dir] = {
+      progress: {
+        bytesRead: 0,
+        bytesDownloaded: 0,
+        filesRead: 0,
+        filesDownloaded: 0
+      },
+      uploaded: {
+        bytesRead: 0
+      },
+      fileQueue: []
+    }
 
-  var uploadRate = speedometer()
-  archive.on('file-upload', function (entry, data) {
-    stats.uploaded.bytesRead += data.length
-    stats.uploadRate = uploadRate(data.length)
-    emitter.emit('stats')
-  })
+    var uploadRate = speedometer()
+    archive.on('file-upload', function (entry, data) {
+      stats.uploaded.bytesRead += data.length
+      stats.uploadRate = uploadRate(data.length)
+      emitter.emit('stats')
+    })
 
-  return emitter
+    return emitter
 
-  function eachItem (item, next) {
-    if (path.normalize(item.path) === path.normalize(item.root)) return next()
-    var appendStats = archive.appendFile(item.path, item.name, next)
-    // This could accumulate too many objects if
-    // logspeed is slow & scanning many files.
-    if (item.type === 'file') {
-      stats.fileQueue.push({
-        name: item.name,
-        stats: appendStats
-      })
-      appendStats.on('end', function () {
-        stats.progress.filesRead += 1
-        stats.progress.bytesRead += appendStats.bytesRead
+    function eachItem (item, next) {
+      if (path.normalize(item.path) === path.normalize(item.root)) return next()
+      var appendStats = archive.appendFile(item.path, item.name, next)
+      // This could accumulate too many objects if
+      // logspeed is slow & scanning many files.
+      if (item.type === 'file') {
+        stats.fileQueue.push({
+          name: item.name,
+          stats: appendStats
+        })
+        appendStats.on('end', function () {
+          stats.progress.filesRead += 1
+          stats.progress.bytesRead += appendStats.bytesRead
+          emitter.emit('stats')
+        })
+      }
+    }
+
+    function done (err) {
+      if (err) return cb(err)
+      archive.finalize(function (err) {
+        if (err) return cb(err)
+        var link = archive.id.toString('hex')
         emitter.emit('stats')
+        self.status[dir].link = link
+        cb(null, link)
       })
     }
-  }
-
-  function done (err) {
-    if (err) return cb(err)
-    archive.finalize(function (err) {
-      if (err) return cb(err)
-      var link = archive.id.toString('hex')
-      emitter.emit('stats')
-      cb(null, link)
-    })
-  }
+  })
 }
 
 Dat.prototype.leave = function (link) {
@@ -190,7 +196,8 @@ Dat.prototype.join = function (link, dir, opts, cb) {
   if (!cb) cb = function noop () {}
 
   var emitter = new events.EventEmitter()
-  var stats = this.status[dir] = {
+  var stats = self.status[dir] = {
+    link: link,
     progress: {
       bytesRead: 0,
       filesRead: 0
