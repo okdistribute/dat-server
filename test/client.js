@@ -101,7 +101,7 @@ test('join', {timeout: 5000}, function (t) {
       rpc.status(function (err, status) {
         if (err) t.ifErr(err, 'no err')
         var key = Object.keys(status)[0]
-        if (status[key].progress.bytesRead === 3) gotCompleteStatus = true
+        if (status[key] && status[key].progress.bytesRead === 3) gotCompleteStatus = true
         setTimeout(getStatus, 10)
       })
     }
