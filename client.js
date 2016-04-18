@@ -3,9 +3,15 @@ var extend = require('xtend')
 var path = require('path')
 var os = require('os')
 
+var dir = os.tmpdir()
+
+var sockPath = process.platform === 'win32'
+    ? '\\\\.\\pipe\\datserver\\' + dir
+    : path.join(dir, 'datserver.sock')
+
 var autodOpts = {
   rpcfile: path.join(__dirname, 'server.js'),
-  sockfile: path.join(os.tmpdir(), 'datserver.sock'),
+  sockfile: sockPath,
   methods: [ 'status', 'link', 'join', 'leave', 'close' ]
 }
 
