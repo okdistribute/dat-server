@@ -46,7 +46,7 @@ test('status', {timeout: 5000}, function (t) {
     // tests basename
     rpc.status(function (err, status) {
       t.ifErr(err, 'no err')
-      var key = Object.keys(status)[0]
+      var key = Object.keys(status.dats)[0]
       var dir = path.basename(key)
       t.equals(dir, 'testdat', 'basename matches')
     })
@@ -65,8 +65,8 @@ test('status', {timeout: 5000}, function (t) {
       }
       rpc.status(function (err, status) {
         if (err) t.ifErr(err, 'no err')
-        var key = Object.keys(status)[0]
-        if (status[key].progress.bytesRead === 3) gotCompleteStatus = true
+        var key = Object.keys(status.dats)[0]
+        if (status.dats[key].progress.bytesRead === 3) gotCompleteStatus = true
         setTimeout(getStatus, 10)
       })
     }
@@ -100,8 +100,8 @@ test('join', {timeout: 5000}, function (t) {
       }
       rpc.status(function (err, status) {
         if (err) t.ifErr(err, 'no err')
-        var key = Object.keys(status)[0]
-        if (status[key] && status[key].progress.bytesRead === 3) gotCompleteStatus = true
+        var key = Object.keys(status.dats)[0]
+        if (status.dats[key] && status.dats[key].progress.bytesRead === 3) gotCompleteStatus = true
         setTimeout(getStatus, 10)
       })
     }

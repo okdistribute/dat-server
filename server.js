@@ -6,7 +6,13 @@ var dat = Dat()
 module.exports = function (server, stream) {
   return {
     status: function (cb) {
-      cb(null, dat.status)
+      cb(null, {
+        dats: dat.status,
+        swarm: {
+          connections: dat.swarm.connections.length,
+          connecting: dat.swarm.connecting
+        }
+      })
     },
     link: function (dirs, cb) {
       dat.link(dirs, cb)
