@@ -39,11 +39,12 @@ Dat.prototype.status = function (cb) {
   })
 }
 
-Dat.prototype.leave = function (link) {
+Dat.prototype.leave = function (link, cb) {
   client(function (err, rpc, conn) {
     if (err) throw err
     rpc.leave(link)
     conn.destroy()
+    cb()
   })
 }
 
