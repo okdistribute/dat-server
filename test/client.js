@@ -51,25 +51,11 @@ test('status', {timeout: 5000}, function (t) {
       t.equals(dir, 'testdat', 'basename matches')
     })
 
-    // tests status value
-    var gotCompleteStatus = false
-    setTimeout(getStatus, 10)
-    function getStatus () {
-      if (gotCompleteStatus) {
-        t.ok(true, 'got complete status')
-        rpc.close(function (err) {
-          t.ifErr(err, 'no err')
-          conn.destroy()
-          t.end()
-        })
-      }
-      rpc.status(function (err, status) {
-        if (err) t.ifErr(err, 'no err')
-        var key = Object.keys(status.dats)[0]
-        if (status.dats[key].progress.bytesRead === 3) gotCompleteStatus = true
-        setTimeout(getStatus, 10)
-      })
-    }
+    testStatus(t, rpc, conn, function (err, status, end) {
+      if (err) t.ifErr(err, 'no err')
+      var key = Object.keys(status.dats)[0]
+      if (status.dats[key].progress.bytesRead === 3) end()
+    })
   })
 })
 
@@ -85,25 +71,60 @@ test('join', {timeout: 5000}, function (t) {
         t.ifErr(err, 'no err')
       })
     })
-
-    // tests status value
-    var gotCompleteStatus = false
-    setTimeout(getStatus, 10)
-    function getStatus () {
-      if (gotCompleteStatus) {
-        t.ok(true, 'got complete status')
-        rpc.close(function (err) {
-          t.ifErr(err, 'no err')
-          conn.destroy()
-          t.end()
-        })
-      }
-      rpc.status(function (err, status) {
-        if (err) t.ifErr(err, 'no err')
-        var key = Object.keys(status.dats)[0]
-        if (status.dats[key] && status.dats[key].progress.bytesRead === 3) gotCompleteStatus = true
-        setTimeout(getStatus, 10)
-      })
-    }
+    testStatus(t, rpc, conn, function (err, status, end) {
+      t.ifErr(err, 'no err')
+      var key = Object.keys(status.dats)[0]
+      if (status.dats[key] && status.dats[key].progress.bytesRead === 3) end()
+    })
   })
 })
+
+test('leave', function (t) {
+  client(function (err, rpc, conn) {
+    t.ifErr(err, 'no err')
+    var link
+    rpc.link(testdat, function (err, hash) {
+      t.ifErr(err, 'no err')
+      link = hash
+      t.equals(link, TEST_HASH)
+      rpc.join(link, testdat, function (err) {
+        t.ifErr(err, 'no err')
+      })
+    })
+
+    testStatus(t, rpc, conn, function (err, status, end) {
+      t.ifErr(err, 'no err on status')
+      var key = Object.keys(status.dats)[0]
+      if (status.dats[key] && status.dats[key].progress.bytesRead === 3) {
+        rpc.leave(key, function (err) {
+          t.ifErr(err, 'no err on leave')
+          t.ok(true, 'called leave callback')
+          rpc.status(function (err, status) {
+            t.iferror(err, 'no error')
+            t.notOk(status.dats[key], 'dat is gone')
+            end()
+          })
+        })
+      }
+    })
+  })
+})
+
+function testStatus (t, rpc, conn, cb) {
+  // tests status value
+  setTimeout(getStatus, 10)
+  function end () {
+    t.ok(true, 'got complete status')
+    rpc.close(function (err) {
+      t.ifErr(err, 'no err')
+      conn.destroy()
+      t.end()
+    })
+  }
+  function getStatus () {
+    rpc.status(function (err, status) {
+      cb(err, status, end)
+      setTimeout(getStatus, 10)
+    })
+  }
+}

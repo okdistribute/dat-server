@@ -22,6 +22,7 @@ module.exports = function (server, stream) {
     },
     leave: function (id, cb) {
       dat.leave(id)
+      cb()
     },
     close: function (cb) {
       dat.close(function () {

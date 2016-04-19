@@ -164,11 +164,15 @@ Dat.prototype.link = function (dir, cb) {
   })
 }
 
-Dat.prototype.leave = function (link) {
-  link = this._normalize(link)
-  var key = new Buffer(link, 'hex')
-  debug('leaving', link, key)
-  this.swarm.leave(key)
+Dat.prototype.leave = function (dir) {
+  var self = this
+  debug('leaving', dat)
+  var dat = self.status[dir]
+  var link = self._normalize(dat.link)
+  debug('left', link)
+  self.swarm.leave(new Buffer(link, 'hex'))
+  self.status[dir] = undefined
+  return
 }
 
 Dat.prototype.close = function (cb) {
