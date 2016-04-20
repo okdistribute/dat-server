@@ -9,6 +9,8 @@ var through = require('through2')
 var discoverySwarm = require('discovery-swarm')
 var events = require('events')
 
+var config = require('./config.js')
+
 module.exports = Dat
 
 var DEFAULT_PORT = 3282
@@ -29,6 +31,14 @@ function Dat (opts) {
   self.allPeers = {}
   self.blacklist = {}
   self.status = {}
+  self.config = config()
+
+  for (var i in self.config.dats) {
+    var dat = self.config.dats[i]
+    self.join(dat.link, dat.dir, dat.opts, function (err) {
+      if (err) throw err
+    })
+  }
 
   var discovery = opts.discovery !== false
   self.swarm = discoverySwarm({
@@ -254,7 +264,11 @@ Dat.prototype.join = function (link, dir, opts, cb) {
 
     function downloadStream () {
       pump(archive.createEntryStream(), download, function (err) {
-        cb(err)
+        if (err) return cb(err)
+        self.config.add({
+          dir: dir,
+          link: link
+        })
       })
     }
   })
