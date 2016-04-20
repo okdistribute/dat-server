@@ -201,6 +201,9 @@ Dat.prototype.join = function (link, dir, opts, cb) {
   if (!opts) opts = {}
   if (!cb) cb = function noop () {}
 
+  if (!link) return cb(new Error('Link required'))
+  if (!dir) return cb(new Error('Directory required'))
+
   var emitter = new events.EventEmitter()
   var stats = self.status[dir] = {
     link: link,
