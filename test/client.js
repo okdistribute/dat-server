@@ -101,7 +101,7 @@ test('leave', function (t) {
           t.ok(true, 'called leave callback')
           rpc.status(function (err, status) {
             t.iferror(err, 'no error')
-            t.notOk(status.dats[key], 'dat is gone')
+            t.equals(status.dats[key].state, 'inactive', 'dat is inactive')
             end()
           })
         })
