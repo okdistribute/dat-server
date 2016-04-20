@@ -6,7 +6,10 @@ function Dat () {
   if (!(this instanceof Dat)) return new Dat()
 }
 
-Dat.prototype.join = function (link, dir, cb) {
+Dat.prototype.join = function (link, dir, opts, cb) {
+  if ((typeof opts) === 'function') return this.join(link, dir, {}, opts)
+  if (!opts) opts = {}
+  if (!cb) cb = function noop () {}
   client(function (err, rpc, conn) {
     if (err) return cb(err)
     rpc.join(link, dir, function (err) {

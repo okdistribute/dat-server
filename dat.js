@@ -257,9 +257,7 @@ Dat.prototype.join = function (link, dir, opts, cb) {
     })
 
     function downloadStream () {
-      pump(archive.createEntryStream(), download, function (err) {
-        if (err) return cb(err)
-      })
+      pump(archive.createEntryStream(), download, cb)
     }
   })
 
