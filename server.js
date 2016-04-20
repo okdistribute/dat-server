@@ -14,8 +14,8 @@ module.exports = function (server, stream) {
         }
       })
     },
-    link: function (dirs, cb) {
-      dat.link(dirs, cb)
+    link: function (dir, cb) {
+      dat.link(dir, cb)
     },
     join: function (link, dir, opts, cb) {
       dat.join(link, dir, opts, cb)
