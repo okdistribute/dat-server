@@ -14,9 +14,14 @@ Dat.prototype.join = function (link, dir, opts, cb) {
     if (err) return cb(err)
     rpc.join(link, dir, function (err) {
       if (err) return cb(err)
+      if (!opts.wait) {
+        conn.destroy()
+      }
+    })
+    if (opts.wait === false) {
       conn.destroy()
       cb()
-    })
+    }
   })
 }
 
