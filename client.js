@@ -12,7 +12,7 @@ var sockPath = process.platform === 'win32'
 var autodOpts = {
   rpcfile: path.join(__dirname, 'server.js'),
   sockfile: sockPath,
-  methods: [ 'status', 'link', 'join', 'leave', 'close' ]
+  methods: [ 'status', 'link', 'join', 'joinSync', 'leave', 'close' ]
 }
 
 module.exports = function (opts, cb) {

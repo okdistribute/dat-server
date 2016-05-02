@@ -1,5 +1,6 @@
 var path = require('path')
 var fs = require('fs')
+var debug = require('debug')('dat-server')
 var homeDir = require('home-dir')
 
 var CONFIG_PATH = path.join(homeDir(), '.dat', 'config.json')
@@ -14,30 +15,39 @@ function Config (opts) {
   self.read()
 }
 
-Config.prototype.read = function () {
+Config.prototype.read = function (cb) {
   var self = this
   try {
     var data = fs.readFileSync(self.configPath)
+    self.data = JSON.parse(data.toString())
+    debug('read', self.data)
+    cb()
   } catch (err) {
-    self.data = { dats: [] }
-    self.write()
-    return
+    self.data = { dats: {} }
+    debug('read with err', self.data, err)
+    self.write(self.data, cb)
   }
-  self.data = JSON.parse(data.toString())
-  self.write()
 }
 
-Config.prototype.add = function (dat) {
+Config.prototype.remove = function (dat, cb) {
   var self = this
-  self.read()
-  self.data.dats[dat.dir] = {
-    link: dat.link,
-    opts: dat.opts
-  }
-  self.write()
+  self.data.dats[dat.dir] = undefined
+  self.write(self.data, cb)
 }
 
-Config.prototype.write = function () {
+Config.prototype.add = function (dat, cb) {
+  this.data.dats[dat.dir] = {
+    link: dat.link
+  }
+  this.data.dats[dat.dir] = dat
+  debug('added', this.data)
+  this.write(this.data, cb)
+}
+
+Config.prototype.write = function (data, cb) {
   var self = this
-  fs.writeFileSync(self.configPath, JSON.stringify(self.data))
+  debug('writing self.data', self.data)
+  var writing = JSON.stringify(data, null, 2)
+  debug('writing', writing, 'to', self.configPath)
+  fs.writeFile(self.configPath, writing, cb)
 }

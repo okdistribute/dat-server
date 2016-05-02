@@ -1,27 +1,51 @@
 var client = require('./client.js')
+var Config = require('./config.js')
 
 module.exports = Dat
 
 function Dat () {
   if (!(this instanceof Dat)) return new Dat()
+  this.config = Config()
+}
+
+Dat.prototype.joinSync = function (link, dir, opts, cb) {
+  var self = this
+  if ((typeof opts) === 'function') return this.join(link, dir, {}, opts)
+  if (!opts) opts = {}
+  client(function (err, rpc, conn) {
+    if (err) return cb(err)
+    rpc.joinSync(link, dir, function (err) {
+      if (err) return cb(err)
+      conn.destroy()
+      cb()
+      self.config.add({
+        dir: dir,
+        link: link
+      }, function () {
+        conn.destroy()
+        cb()
+      })
+    })
+  })
 }
 
 Dat.prototype.join = function (link, dir, opts, cb) {
+  var self = this
   if ((typeof opts) === 'function') return this.join(link, dir, {}, opts)
   if (!opts) opts = {}
-  if (!cb) cb = function noop () {}
   client(function (err, rpc, conn) {
     if (err) return cb(err)
     rpc.join(link, dir, function (err) {
       if (err) return cb(err)
-      if (!opts.wait) {
+      self.config.add({
+        dir: dir,
+        link: link
+      }, function (err) {
+        if (err) return cb(err)
         conn.destroy()
-      }
+        cb()
+      })
     })
-    if (opts.wait === false) {
-      conn.destroy()
-      cb()
-    }
   })
 }
 
@@ -33,6 +57,17 @@ Dat.prototype.link = function (dir, cb) {
       conn.destroy()
       cb(null, link)
     })
+  })
+}
+
+Dat.prototype.remove = function (dir, cb) {
+  var self = this
+  client(function (err, rpc, conn) {
+    if (err) throw err
+    rpc.remove(dir)
+    self.config.remove({dir: dir})
+    conn.destroy()
+    cb()
   })
 }
 

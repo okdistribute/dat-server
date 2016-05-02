@@ -17,6 +17,16 @@ module.exports = function (server, stream) {
     link: function (dir, cb) {
       dat.link(dir, cb)
     },
+    joinSync: function (link, dir, opts, cb) {
+      dat.join(link, dir, opts, function (err) {
+        if (err) throw err
+      })
+      cb()
+    },
+    remove: function (dir, cb) {
+      dat.remove(dir)
+      cb()
+    },
     join: function (link, dir, opts, cb) {
       dat.join(link, dir, opts, cb)
     },

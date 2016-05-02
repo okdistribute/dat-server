@@ -19,6 +19,7 @@
   "homepage": "https://github.com/karissa/dat-server#readme",
   "dependencies": {
     "auto-daemon": "^2.6.0",
+    "debug": "^2.2.0",
     "debut": "0.0.10",
     "discovery-swarm": "^3.1.2",
     "folder-walker": "^2.1.1",
