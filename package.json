@@ -1,7 +1,7 @@
 {
   "name": "dat-server",
   "version": "1.0.0",
-  "description": "dat dat server",
+  "description": "A server daemon hyperdrive + swarm",
   "main": "index.js",
   "scripts": {
     "test": "standard && node test/client.js"
@@ -25,12 +25,13 @@
     "folder-walker": "^2.1.1",
     "from2": "^2.1.1",
     "home-dir": "^1.0.0",
-    "hyperdrive": "^4.1.0",
+    "hyperdrive": "^5.0.0",
     "jquery": "^2.2.3",
     "jquery.transit": "^0.9.12",
     "level-party": "^3.0.4",
     "mkdirp": "^0.5.1",
     "pump": "^1.0.1",
+    "random-access-file": "^1.2.0",
     "speedometer": "^1.0.0",
     "stream-each": "^1.1.2",
     "through2": "^2.0.1",

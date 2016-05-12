@@ -1,4 +1,5 @@
 var path = require('path')
+var raf = require('random-access-file')
 var debug = require('debug')('dat')
 var walker = require('folder-walker')
 var hyperdrive = require('hyperdrive')
@@ -106,7 +107,11 @@ Dat.prototype.link = function (dir, cb) {
   if (Array.isArray(dir)) throw new Error('cannot specify multiple dirs in .link')
   self.fileStats(dir, function (err, totalStats) {
     if (err) throw err
-    var archive = self.drive.add('.')
+    var archive = self.drive.createArchive({
+      file: function (name) {
+        return raf(path.join(dir, name))
+      }
+    })
     self.scan(dir, eachItem, done)
     var emitter = new events.EventEmitter()
 
@@ -137,18 +142,18 @@ Dat.prototype.link = function (dir, cb) {
 
     function eachItem (item, next) {
       if (path.normalize(item.path) === path.normalize(item.root)) return next()
-      var appendStats = archive.appendFile(item.path, item.name, next)
+      archive.append(item.name, function () {
+        stats.progress.filesRead += 1
+        stats.progress.bytesRead += item.size
+        emitter.emit('stats')
+        next()
+      })
+
       // This could accumulate too many objects if
       // logspeed is slow & scanning many files.
       if (item.type === 'file') {
         stats.fileQueue.push({
-          name: item.name,
-          stats: appendStats
-        })
-        appendStats.on('end', function () {
-          stats.progress.filesRead += 1
-          stats.progress.bytesRead += appendStats.bytesRead
-          emitter.emit('stats')
+          name: item.name
         })
       }
     }
@@ -157,7 +162,7 @@ Dat.prototype.link = function (dir, cb) {
       if (err) return cb(err)
       archive.finalize(function (err) {
         if (err) return cb(err)
-        var link = archive.id.toString('hex')
+        var link = archive.key.toString('hex')
         emitter.emit('stats')
         self.status[dir].link = link
         cb(null, link)
@@ -179,10 +184,7 @@ Dat.prototype.leave = function (dir) {
 
 Dat.prototype.close = function (cb) {
   var self = this
-  this.drive.core.db.close(function (err) {
-    if (err) return cb(err)
-    self.swarm.destroy(cb)
-  })
+  self.swarm.destroy(cb)
 }
 
 Dat.prototype._normalize = function (link) {
@@ -223,11 +225,18 @@ Dat.prototype.join = function (link, dir, opts, cb) {
     },
     fileQueue: []
   }
-  link = this._normalize(link)
-  self.swarm.join(new Buffer(link, 'hex'))
+  link = new Buffer(this._normalize(link), 'hex')
+  self.swarm.join(link)
+  self.swarm.on('connection', function (connection) {
+    connection.pipe(archive.replicate()).pipe(connection)
+  })
   var downloadRate = speedometer()
   var uploadRate = speedometer()
-  var archive = self.get(link, dir)
+  var archive = self.drive.createArchive(link, {
+    file: function (name) {
+      return raf(path.join(dir, name))
+    }
+  })
 
   archive.on('file-upload', function (entry, data) {
     stats.uploaded.bytesRead += data.length
@@ -235,34 +244,26 @@ Dat.prototype.join = function (link, dir, opts, cb) {
     emitter.emit('stats')
   })
 
-  archive.ready(function (err) {
-    if (err) return cb(err)
-    var download = self.fs.createDownloadStream(archive, stats, opts)
-    stats.gettingMetadata = true
+  var download = self.fs.createDownloadStream(archive, stats, opts)
+  stats.gettingMetadata = true
+  emitter.emit('stats')
+  var counter = through.obj(function (item, enc, next) {
+    stats.total.bytesTotal += item.length
+    if (item.type === 'file') stats.total.filesTotal++
+    else stats.total.directories++
     emitter.emit('stats')
-    var counter = through.obj(function (item, enc, next) {
-      if (typeof stats.parentFolder === 'undefined') {
-        var segments = item.name.split(path.sep)
-        if (segments.length === 1 && item.type === 'file') stats.parentFolder = false
-        else stats.parentFolder = segments[0]
-      }
-      stats.total.bytesTotal += item.size
-      if (item.type === 'file') stats.total.filesTotal++
-      else stats.total.directories++
-      emitter.emit('stats')
-      next(null)
-    })
-    pump(archive.createEntryStream(), counter, function (err) {
-      if (err) return cb(err)
-      stats.hasMetadata = true
-      emitter.emit('stats')
-      downloadStream()
-    })
-
-    function downloadStream () {
-      pump(archive.createEntryStream(), download, cb)
-    }
+    next(null)
   })
+  pump(archive.list(), counter, function (err) {
+    if (err) return cb(err)
+    stats.hasMetadata = true
+    emitter.emit('stats')
+    downloadStream()
+  })
+
+  function downloadStream () {
+    pump(archive.list(), download, cb)
+  }
 
   archive.on('file-download', function (entry, data, block) {
     stats.progress.bytesRead += data.length
