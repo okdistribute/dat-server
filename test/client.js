@@ -6,7 +6,7 @@ var os = require('os')
 var sockPath = path.join(os.tmpdir(), 'datserver.sock')
 var testdat = path.join(__dirname, 'testdat')
 
-var TEST_HASH = 'c98a7c5c6fe0b539b496fbe73d4ec2f270106794774614c5fb52fc47fda3b236'
+var TEST_HASH = '714b0042144d29da52b7d1e7114e59f03e1bb14e84fc659c3051984576a2a23e'
 
 test('close and destroy kills the matt daemon', function (t) {
   client(function (err, rpc, conn) {

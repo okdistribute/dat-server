@@ -33,12 +33,8 @@ function Dat (opts) {
 
   var discovery = opts.discovery !== false
   self.swarm = discoverySwarm({
-    id: drive.core.id,
     dns: discovery && {server: DEFAULT_DISCOVERY, domain: DAT_DOMAIN},
-    dht: discovery,
-    stream: function () {
-      return drive.createPeerStream()
-    }
+    dht: discovery
   })
   self.swarm.listen(opts.port || DEFAULT_PORT)
   self.swarm.once('error', function (err) {
