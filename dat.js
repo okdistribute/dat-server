@@ -137,10 +137,12 @@ Dat.prototype.link = function (dir, cb) {
     return emitter
 
     function eachItem (item, next) {
+      var fileStats = {bytesRead: 0}
       if (path.normalize(item.path) === path.normalize(item.root)) return next()
       archive.append(item.name, function () {
         stats.progress.filesRead += 1
         stats.progress.bytesRead += item.size
+        fileStats.bytesRead += item.size
         emitter.emit('stats')
         next()
       })
@@ -149,7 +151,8 @@ Dat.prototype.link = function (dir, cb) {
       // logspeed is slow & scanning many files.
       if (item.type === 'file') {
         stats.fileQueue.push({
-          name: item.name
+          name: item.name,
+          stats: fileStats
         })
       }
     }
