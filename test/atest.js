@@ -22,7 +22,7 @@ test('download with swarm', function (t) {
 
   archive.finalize(function (err) { // finalize the archive
     t.error(err, 'no error')
-    var link = new Buffer(archive.key.toString('hex'), 'hex')
+    var link = archive.key
     var archive2 = drive2.createArchive(link, {
       file: function (name) {
         return raf(path.join(__dirname, name))
