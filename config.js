@@ -1,9 +1,11 @@
 var path = require('path')
+var mkdirp = require('mkdirp')
 var fs = require('fs')
 var debug = require('debug')('dat-server')
 var homeDir = require('home-dir')
 
-var CONFIG_PATH = path.join(homeDir(), '.dat', 'config.json')
+var DAT_PATH = path.join(homeDir(), '.dat')
+var CONFIG_PATH = path.join(DAT_PATH, 'config.json')
 
 module.exports = Config
 
@@ -49,5 +51,8 @@ Config.prototype.write = function (data, cb) {
   debug('writing self.data', self.data)
   var writing = JSON.stringify(data, null, 2)
   debug('writing', writing, 'to', self.configPath)
-  fs.writeFile(self.configPath, writing, cb)
+  mkdirp(DAT_PATH, function (err) {
+    if (err) return cb(err)
+    fs.writeFile(self.configPath, writing, cb)
+  })
 }
