@@ -139,11 +139,11 @@ Dat.prototype.link = function (dir, cb) {
     function eachItem (item, next) {
       var fileStats = {bytesRead: 0}
       if (path.normalize(item.path) === path.normalize(item.root)) return next()
-      console.log('appending', item)
+      debug('appending', item)
       archive.append(item.name, function () {
         stats.progress.filesRead += 1
         stats.progress.bytesRead += item.size
-        console.log('done')
+        debug('done adding', item.name)
         fileStats.bytesRead += item.size
         emitter.emit('stats')
         next()
@@ -210,7 +210,7 @@ Dat.prototype.join = function (link, dir, opts, cb) {
   debug('joining', link)
   var archive = self.drive.createArchive(link, {
     file: function (name) {
-      console.log(dir)
+      debug('raf', dir, name)
       return raf(path.join(dir, name))
     }
   })
