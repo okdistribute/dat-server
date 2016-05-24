@@ -1,4 +1,4 @@
-var Dat = require('./dat.js')
+var Dat = require('hyperdrive-swarm')
 // var through = require('through2')
 
 var dat = Dat()
