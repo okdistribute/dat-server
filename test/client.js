@@ -79,6 +79,29 @@ test('join', {timeout: 5000}, function (t) {
   })
 })
 
+test('replication', function (t) {
+  client(function (err, rpc, conn) {
+    t.ifErr(err, 'no err')
+    var link
+    rpc.link(testdat, function (err, hash) {
+      t.ifErr(err, 'no err')
+      link = hash
+      t.equals(link, TEST_HASH)
+      rpc.join(link, testdat, function (err) {
+        t.ifErr(err, 'no err')
+        var downloadPath = path.join(__dirname, 'downloads')
+        rpc.join(link, downloadPath, function (err) {
+          t.ifErr(err, 'no error')
+          var testContents = fs.readFileSync(path.join(testdat, 'hello.txt')).toString()
+          var contents = fs.readFileSync(path.join(downloadPath, 'hello.txt')).toString()
+          t.same(contents, testContents, 'contents are the same')
+          t.end()
+        })
+      })
+    })
+  })
+})
+
 test('leave', function (t) {
   client(function (err, rpc, conn) {
     t.ifErr(err, 'no err')
