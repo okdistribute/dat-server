@@ -1,45 +1,20 @@
-var Dat = require('hyperdrive-swarm')
-// var through = require('through2')
+var http = require('http')
+var st = require('st')
+var Router = require('./router.js')
+var fs = require('fs')
+var path = require('path')
 
-var dat = Dat()
+var settings = JSON.parse(fs.readFileSync(path.resolve('config.json')).toString())
+var router = Router(settings)
 
-module.exports = function (server, stream) {
-  return {
-    status: function (cb) {
-      cb(null, {
-        dats: dat.status,
-        swarm: {
-          connections: dat.swarm.connections.length,
-          connecting: dat.swarm.connecting
-        }
-      })
-    },
-    link: function (dir, cb) {
-      dat.link(dir, cb)
-    },
-    joinSync: function (link, dir, opts, cb) {
-      dat.join(link, dir, opts, function (err) {
-        if (err) throw err
-      })
-      cb()
-    },
-    remove: function (dir, cb) {
-      dat.remove(dir)
-      cb()
-    },
-    join: function (link, dir, opts, cb) {
-      dat.join(link, dir, opts, cb)
-    },
-    leave: function (id, cb) {
-      dat.leave(id)
-      cb()
-    },
-    close: function (cb) {
-      dat.close(function () {
-        server.close()
-        cb()
-        stream.destroy()
-      })
+module.exports = http.createServer(function (req, res) {
+  if (st({ path: 'static/', url: 'static/' })(req, res)) return
+  router(req, res, {}, onError)
+
+  function onError (err) {
+    if (err) {
+      res.statusCode = err.statusCode || 500
+      res.end(JSON.stringify({error: true, message: err.message, statusCode: res.statusCode}))
     }
   }
-}
+})
