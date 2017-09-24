@@ -1,6 +1,6 @@
 {
   "name": "dat-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A web app for backing up dat archives on a remote server.",
   "main": "index.js",
   "scripts": {
