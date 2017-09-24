@@ -1,7 +1,7 @@
 {
   "name": "dat-server",
   "version": "1.0.0",
-  "description": "A web interface for managing [dat repositories](http://dat-data.com) on a remote server.",
+  "description": "A web app for backing up dat archives on a remote server.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,7 +14,7 @@
     "url": "git+https://github.com/karissa/dat-server.git"
   },
   "author": "Karissa McKelvey <karissa@karissamck.com> (http://karissamck.com/)",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/karissa/dat-server/issues"
   },
