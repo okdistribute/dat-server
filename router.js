@@ -1,83 +1,59 @@
-var Router = require('http-hash-router')
+var express = require('express')
+var resolve = require('dat-link-resolve')
+var bodyParser = require('body-parser')
 var fs = require('fs')
-var json = require('body/json')
 var path = require('path')
-var Manager = require('dat-manager')
+var archiver = require('hypercore-archiver')
+var swarm = require('hypercore-archiver/swarm')
 var url = require('url')
 
 module.exports = createRouter
 
-function createRouter (settings) {
-  var router = Router()
-  var manager = Manager(settings)
+function createRouter (config) {
+  var router = express()
+  router.use(bodyParser.json())
+  var ar = archiver(path.join(process.cwd(), config.dir))
+  var sw = swarm(ar)
+  sw.on('listening', function () {
+    console.log('listening')
+  })
 
-  router.set('/', function (req, res, opts, cb) {
+  function onerror (res, err) {
+    res.statusCode = err.statusCode || 500
+    res.end(JSON.stringify({error: true, message: err.message, statusCode: res.statusCode}))
+  }
+
+  router.get('/', function (req, res) {
     res.end(fs.readFileSync(path.join(__dirname, 'index.html')).toString())
   })
 
-  router.set('/api/settings', function (req, res, opts, cb) {
-    if (req.method === 'POST') {
-      json(req, function (err, data) {
-        if (err) return cb(err)
-        settings = data
-        manager.settings(data)
-        res.end('ok')
-      })
-    } else {
-      res.end(JSON.stringify(settings))
-    }
-  })
-
-  router.set('/dats', function (req, res, opts, cb) {
-    if (req.method === 'GET') {
-      manager.list(function (err, dats) {
-        if (err) return cb(err)
-        res.end(JSON.stringify({'dats': dats}))
-      })
-    }
-    else res.end('Method not allowed.')
-  })
-
-  router.set('/dats/:key', function (req, res, opts, cb) {
-    var key = decodeURIComponent(opts.params.key)
-    if (req.method === 'GET') {
-      manager.get(key, function (err, dat) {
-        if (err) return cb(err)
-        res.end(JSON.stringify(dat))
-      })
-    } else if (req.method === 'DELETE') {
-      manager.delete(key, function (err) {
-        if (err) return cb(err)
-        res.end('ok')
-      })
-    } else if (req.method === 'PUT') {
-      json(req, function (err, data) {
-        if (err) return cb(err)
-        manager.update(key, data, function (err) {
-          if (err) return cb(err)
-          res.end('ok')
-        })
-      })
-    }
-    else return cb(new Error('Method not allowed.'))
-  })
-
-  router.set('/dats/:key/start', function (req, res, opts, cb) {
-    if (req.method !== 'GET') return cb(new Error('Method not allowed.'))
-    var key = decodeURIComponent(opts.params.key)
-    var link = url.parse(req.url, true).query.link
-    manager.start(key, {link: link}, function (err, data) {
-      if (err) return cb(err)
-      res.end(JSON.stringify(data))
+  router.get('/dats', function (req, res) {
+    ar.list(function (err, dats) {
+      if (err) return onerror(res, err)
+      res.send(dats.map((dat) => dat.toString('hex')))
     })
   })
 
-  router.set('/dats/:key/stop', function (req, res, opts, cb) {
-    if (req.method !== 'GET') return cb(new Error('Method not allowed.'))
-    var key = decodeURIComponent(opts.params.key)
-    manager.stop(key, function (err, data) {
-      if (err) return cb(err)
-      res.end(JSON.stringify(data))
+  router.delete('/dats', function (req, res) {
+    console.log(req.body)
+    if (!req.body.key) return onerror(res, new Error('key required'))
+    resolve(req.body.key, function (err, key) {
+      if (err) return onerror(res, err)
+      ar.remove(key, function (err) {
+        if (err) return onerror(res, err)
+        res.send('ok')
+      })
+    })
+  })
+
+  router.post('/dats', function (req, res) {
+    if (!req.body.key) return onerror(res, new Error('key required'))
+    resolve(req.body.key, function (err, key) {
+      if (err) return onerror(res, err)
+      ar.add(key, function (err) {
+        if (err) return onerror(res, err)
+        res.send('ok')
+      })
     })
   })
 
