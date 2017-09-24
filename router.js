@@ -12,7 +12,7 @@ module.exports = createRouter
 function createRouter (config) {
   var router = express()
   router.use(bodyParser.json())
-  var ar = archiver(path.join(process.cwd(), config.dir))
+  var ar = archiver(path.resolve(process.cwd(), config.dir))
   var sw = swarm(ar)
   sw.on('listening', function () {
     console.log('listening')
@@ -35,7 +35,6 @@ function createRouter (config) {
   })
 
   router.delete('/dats', function (req, res) {
-    console.log(req.body)
     if (!req.body.key) return onerror(res, new Error('key required'))
     resolve(req.body.key, function (err, key) {
       if (err) return onerror(res, err)

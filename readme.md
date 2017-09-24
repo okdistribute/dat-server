@@ -1,12 +1,10 @@
 # dat-server
 
-A web interface for managing [dat repositories](http://dat-data.com) on a remote server.
-
-![static/example.png](static/example.png)
+A server for managing dat archives. 
 
 ## Installation
 
-1. Clone this repository and install dependencies.
+Clone this repository and install dependencies.
 
 ```
 git clone https://github.com/karissa/dat-server.git
@@ -14,15 +12,15 @@ cd dat-server
 npm install
 ```
 
-2. Create the config
+Create the config
 
-Pay attention to where downloaded dats will be stored. Edit the `location` field so that it suits your setup.
+Pay attention to where downloaded dats will be stored. Edit the `dir` field so that it suits your setup.
 
 ```
 cp example.config.json config.json
 ```
 
-3. Build assets and run the app.
+Build assets and run the app.
 
 ```
 npm start
