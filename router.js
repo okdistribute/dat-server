@@ -1,3 +1,4 @@
+var index = require('./index.js')
 var express = require('express')
 var resolve = require('dat-link-resolve')
 var bodyParser = require('body-parser')
@@ -25,7 +26,7 @@ function createRouter (config) {
   }
 
   router.get('/', function (req, res) {
-    res.end(fs.readFileSync(path.join(__dirname, 'index.html')).toString())
+    res.end(index(config))
   })
 
   router.get('/dats', function (req, res) {

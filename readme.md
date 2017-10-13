@@ -12,20 +12,22 @@ cd dat-server
 npm install
 ```
 
-Create the config
+## Create the config
 
-Pay attention to where downloaded dats will be stored. Edit the `dir` field so that it suits your setup.
+Copy the example config and change the variables to suit your setup.
 
 ```
 cp example.config.json config.json
 ```
 
-Build assets and run the app.
+* `dir`: Where downloaded dats will be stored. 
+* `title`: The visible title of the app.
+
+## Build assets and run the app.
 
 ```
 npm start
 ```
-
 
 # API
 
