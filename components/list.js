@@ -1,3 +1,4 @@
+var api = require('../api')
 var React = require('react')
 var ReactDOM = require('react-dom')
 var prettyBytes = require('pretty-bytes')
@@ -8,14 +9,7 @@ var xhr = require('../request.js')
 var DeleteButton = React.createClass({
   delete: function () {
     var self = this
-    var opts = {
-      uri: '/dats',
-      method: 'DELETE',
-      json: {
-        key: this.props.dat
-      }
-    }
-    xhr(opts, function (resp, json) {
+    api.delete(this.props.dat, function (err, resp, json) {
       render()
     })
   },
@@ -49,18 +43,13 @@ var List = React.createClass({
   }
 })
 
-module.exports = render
-
-function render (cb) {
-  xhr({uri: '/dats', json: true}, function (resp, json) {
-    if (cb) cb(json)
-    _render(json)
+module.exports = function render (cb) {
+  api.list(function (err, dats) {
+    if (cb) cb(dats)
+    if (!dats) dats = []
+    ReactDOM.render(
+      <List dats={dats} />,
+      document.getElementById('app')
+    )
   })
-}
-
-function _render (dats) {
-  ReactDOM.render(
-    <List dats={dats} />,
-    document.getElementById('app')
-  )
 }

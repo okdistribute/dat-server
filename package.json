@@ -25,6 +25,7 @@
     "body": "^5.1.0",
     "body-parser": "^1.18.2",
     "browserify": "^13.0.0",
+    "dat-encoding": "^4.0.2",
     "dat-link-resolve": "^1.1.1",
     "express": "^4.15.4",
     "getport": "^0.1.0",

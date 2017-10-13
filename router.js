@@ -3,6 +3,7 @@ var resolve = require('dat-link-resolve')
 var bodyParser = require('body-parser')
 var fs = require('fs')
 var path = require('path')
+var encoding = require('dat-encoding')
 var archiver = require('hypercore-archiver')
 var swarm = require('hypercore-archiver/swarm')
 var url = require('url')
@@ -49,6 +50,7 @@ function createRouter (config) {
     if (!req.body.key) return onerror(res, new Error('key required'))
     resolve(req.body.key, function (err, key) {
       if (err) return onerror(res, err)
+      key = encoding.encode(key)
       ar.add(key, function (err) {
         if (err) return onerror(res, err)
         res.send('ok')
