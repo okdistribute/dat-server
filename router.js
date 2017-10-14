@@ -49,10 +49,8 @@ function createRouter (config) {
           done()
         })
       }))
-      console.log(tasks)
       parallel(tasks, function (err) {
         if (err) return onerror(res, err)
-        console.log(dats)
         res.send(dats)
       })
     })
