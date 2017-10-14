@@ -1,5 +1,4 @@
 var parallel = require('run-parallel')
-var index = require('./index.js')
 var express = require('express')
 var resolve = require('dat-link-resolve')
 var bodyParser = require('body-parser')
@@ -8,6 +7,9 @@ var path = require('path')
 var encoding = require('dat-encoding')
 var archiver = require('hyperdrive-archiver')
 var url = require('url')
+var toZipStream = require('hyperdrive-to-zip-stream')
+
+var index = require('./index.js')
 
 module.exports = createRouter
 
@@ -26,6 +28,13 @@ function createRouter (config) {
 
   router.get('/', function (req, res) {
     res.end(index(config))
+  })
+
+  router.get('/download/:key', function (req, res) {
+    ar.get(req.params.key, function (err, archive) {
+      res.attachment(req.params.key)
+      toZipStream(archive).pipe(res)
+    })
   })
 
   router.get('/health/:key', function (req, res) {

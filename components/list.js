@@ -7,6 +7,13 @@ var prettyBytes = require('pretty-bytes')
 var api = require('../api')
 var xhr = require('../request.js')
 
+var DownloadButton = React.createClass({
+  render: function () {
+    var href = '/download/' + this.props.dat
+    return <a href={href} className='green waves-effect waves-light btn'>Download</a>
+  }
+})
+
 var DeleteButton = React.createClass({
   delete: function () {
     var self = this
@@ -22,7 +29,6 @@ var DeleteButton = React.createClass({
 var ListItem = React.createClass({
   render: function () {
     var health = this.props.dat.health
-    console.log(this.props.dat)
     return (
       <div className='section list-item' onClick={this.handleClick}>
         <p>{this.props.dat.key}</p>
@@ -33,7 +39,8 @@ var ListItem = React.createClass({
           {health.peers.length} peers
         </p>
         <div>
-          <DeleteButton dat={this.props.dat} />
+          <DeleteButton dat={this.props.dat.key} />
+          <DownloadButton dat={this.props.dat.key} />
         </div>
       </div>
     )
