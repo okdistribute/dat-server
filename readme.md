@@ -1,6 +1,8 @@
 # dat-server
 
-A server for managing dat archives. 
+A web ui and http interface for archiving dats.
+
+![static/example.png](static/example.png)
 
 ## Installation
 
@@ -20,7 +22,7 @@ Copy the example config and change the variables to suit your setup.
 cp example.config.json config.json
 ```
 
-* `dir`: Where downloaded dats will be stored. 
+* `dir`: Where downloaded dats will be stored.
 * `title`: The visible title of the app.
 
 ## Build assets and run the app.
@@ -48,7 +50,7 @@ with json body:
 
 
 
-TODO: Could return download progress. 
+TODO: Could return download progress.
 
 ```
 { "progress": 30 }
@@ -67,4 +69,3 @@ with json body:
 ```
 
 Delete a dat, removing all data. They key should be the 64-character string without the `dat://` prefix.
-
