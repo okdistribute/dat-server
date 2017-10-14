@@ -36,6 +36,7 @@
     "react-dom": "^0.14.7",
     "react-editinplace": "^1.0.3",
     "rimraf": "^2.5.1",
+    "run-parallel": "^1.1.6",
     "st": "^1.1.0",
     "tape": "^4.4.0",
     "xhr": "^2.2.0"

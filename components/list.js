@@ -1,9 +1,10 @@
-var api = require('../api')
 var React = require('react')
 var ReactDOM = require('react-dom')
 var prettyBytes = require('pretty-bytes')
 var EditInPlace = require('react-editinplace')
+var prettyBytes = require('pretty-bytes')
 
+var api = require('../api')
 var xhr = require('../request.js')
 
 var DeleteButton = React.createClass({
@@ -20,9 +21,17 @@ var DeleteButton = React.createClass({
 
 var ListItem = React.createClass({
   render: function () {
+    var health = this.props.dat.health
+    console.log(this.props.dat)
     return (
       <div className='section list-item' onClick={this.handleClick}>
-        <p>{this.props.dat}</p>
+        <p>{this.props.dat.key}</p>
+        <p>
+          {prettyBytes(health.byteLength)}
+        </p>
+        <p>
+          {health.peers.length} peers
+        </p>
         <div>
           <DeleteButton dat={this.props.dat} />
         </div>
@@ -35,8 +44,8 @@ var List = React.createClass({
   render: function () {
     return (
       <div>
-        {this.props.dats.map(function (key) {
-          return <ListItem dat={key} key={key} />
+        {this.props.dats.map(function (dat) {
+          return <ListItem dat={dat} key={dat.key} />
         })}
       </div>
     )

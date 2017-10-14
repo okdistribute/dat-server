@@ -1,3 +1,4 @@
+var parallel = require('run-parallel')
 var index = require('./index.js')
 var express = require('express')
 var resolve = require('dat-link-resolve')
@@ -5,8 +6,7 @@ var bodyParser = require('body-parser')
 var fs = require('fs')
 var path = require('path')
 var encoding = require('dat-encoding')
-var archiver = require('hypercore-archiver')
-var swarm = require('hypercore-archiver/swarm')
+var archiver = require('hyperdrive-archiver')
 var url = require('url')
 
 module.exports = createRouter
@@ -14,9 +14,8 @@ module.exports = createRouter
 function createRouter (config) {
   var router = express()
   router.use(bodyParser.json())
-  var ar = archiver(path.resolve(process.cwd(), config.dir))
-  var sw = swarm(ar)
-  sw.on('listening', function () {
+  var ar = archiver(config)
+  ar.swarm.on('listening', function () {
     console.log('listening')
   })
 
@@ -29,10 +28,33 @@ function createRouter (config) {
     res.end(index(config))
   })
 
+  router.get('/health/:key', function (req, res) {
+    ar.get(req.params.key, function (err, archive) {
+      res.send(ar.health(archive))
+    })
+  })
+
   router.get('/dats', function (req, res) {
-    ar.list(function (err, dats) {
+    ar.list(function (err, keys) {
       if (err) return onerror(res, err)
-      res.send(dats.map((dat) => dat.toString('hex')))
+      var dats = []
+      var tasks = []
+      keys.forEach((key) => tasks.push((done) => {
+        ar.get(key, function (err, archive) {
+          if (err) return done(err)
+          dats.push({
+            key: key.toString('hex'),
+            health: ar.health(archive)
+          })
+          done()
+        })
+      }))
+      console.log(tasks)
+      parallel(tasks, function (err) {
+        if (err) return onerror(res, err)
+        console.log(dats)
+        res.send(dats)
+      })
     })
   })
 
