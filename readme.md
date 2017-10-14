@@ -39,6 +39,18 @@ GET `/dats`
 
 A list of currently deployed dats in JSON format.
 
+### Download a Dat
+
+GET `/download/:key`
+
+Download a dat to zip file, uses a stream. 
+
+### Dat health
+
+GET `/health/:key`
+
+The health of a dat, including it's size, number of peers, and their replication progress.
+
 ### Add a dat
 
 POST `/dats`
@@ -47,8 +59,6 @@ with json body:
 ```
 {"key": <DAT_KEY>}
 ```
-
-
 
 TODO: Could return download progress.
 
