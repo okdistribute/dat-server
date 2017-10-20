@@ -59,7 +59,9 @@ var List = React.createClass({
   }
 })
 
-module.exports = function render (cb) {
+module.exports = render
+
+function render (cb) {
   api.list(function (err, dats) {
     if (cb) cb(dats)
     if (!dats) dats = []
